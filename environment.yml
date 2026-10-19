@@ -1,0 +1,13 @@
+name: rag-chatbot
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - langchain==0.3.25
+      - langchain-community==0.3.24
+      - sentence-transformers==4.1.0
+      - openai==1.79.0
+      - faiss-cpu==1.11.0
+      - unstructured==0.17.2

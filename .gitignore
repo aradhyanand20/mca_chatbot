@@ -1,0 +1,29 @@
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets
+.env
+**/.env
+!.env.example
+!**/.env.example
+
+# Node.js
+**/node_modules/
+
+# Build output
+**/dist/
+**/build/
+
+# IDE and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated data and indexes
+data/
+faiss_index/
