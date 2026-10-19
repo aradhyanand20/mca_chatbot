@@ -33,3 +33,6 @@ Thumbs.db
 # Generated data and indexes
 data/
 faiss_index/
+
+paper-chat.zip
+package-lock.json
