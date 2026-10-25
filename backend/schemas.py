@@ -9,3 +9,7 @@ class UserPublic(BaseModel):
   email: EmailStr
   id: int
   full_name: str | None = None
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str

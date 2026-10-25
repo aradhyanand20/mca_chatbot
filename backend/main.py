@@ -4,8 +4,8 @@ from sqlalchemy import text
 from sqlmodel import Session, SQLModel, select
 from models import User
 from db import get_session, engine
-from schemas import UserCreate, UserPublic
-from security import hash_password
+from schemas import UserCreate, UserPublic, UserLogin
+from security import hash_password, verify_password,  create_access_token
 
 SQLModel.metadata.create_all(engine)
 app = FastAPI()
@@ -62,3 +62,31 @@ def register_User(data:UserCreate,session: Session= Depends(get_session),):
     email= user.email,
     full_name=user.full_name
   )
+
+@app.post("/login")
+def login_user(
+  data:UserLogin,
+  session: Session = Depends(get_session),
+):
+  user = session.exec(
+    select(User).where(User.email == data.email)
+  ).first()
+
+  if user is None or user.hashed_password is None:
+    raise HTTPException(
+      status_code=status.HTTP_401_UNAUTHORIZED,
+      detail= "Invalid email or password"
+    )
+
+  if not verify_password(data.password, user.hashed_password):
+    raise HTTPException(
+      status_code=status.HTTP_401_UNAUTHORIZED,
+      detail= "Invalid password or email"
+    )
+
+  access_token= create_access_token(user.id)
+
+  return{
+    "access_token": access_token,
+    "token_type": "bearer",
+  }
