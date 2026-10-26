@@ -5,10 +5,39 @@ from sqlmodel import Session, SQLModel, select
 from models import User
 from db import get_session, engine
 from schemas import UserCreate, UserPublic, UserLogin
-from security import hash_password, verify_password,  create_access_token
+from security import hash_password, verify_password,  create_access_token, decode_access_token
+from security import decode_access_token
+from fastapi.security import OAuth2PasswordBearer
+from jwt.exceptions import InvalidTokenError
+
 
 SQLModel.metadata.create_all(engine)
 app = FastAPI()
+
+oauth2_scheme =  OAuth2PasswordBearer(tokenUrl="/login")
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
+    )-> User: 
+  credential_error =  HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED
+    detail="COULD NOT VALIDATE",
+    headers={"WWW-Authenticate": "Bearer"}
+  )
+  try:
+    payload = decode_access_token(token)
+    user_id =int(payload["sub"])
+  except(InvalidTokenError, KeyError, TypeError,ValueError):
+    raise credential_error
+
+  user = session.get(User, user_id)
+
+  if user is None:
+    raise credential_error
+
+  return user
+
 
 @app.get("/health")
 def health(session: Session= Depends(get_session)):
